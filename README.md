@@ -7,7 +7,8 @@ This repository contains all code and data associated with *A Local Structural B
 ```
 amorphous-ice/
 ├── README.md
-├── requirements.txt          # Python dependencies
+├── environment.yml           # Conda environment specification
+├── requirements.txt          # Pip dependencies (alternative)
 ├── src/                      # Source code
 │   ├── config_template.py    # Configuration template for trajectory paths
 │   ├── prep_trajectory.py    # Trajectory preprocessing
@@ -39,6 +40,15 @@ amorphous-ice/
 
 ## Installation
 
+Create and activate a conda environment:
+
+```bash
+conda env create -f environment.yml
+conda activate amorphous-ice
+```
+
+Alternatively, install with pip:
+
 ```bash
 pip install -r requirements.txt
 ```
@@ -57,7 +67,7 @@ Notebooks are organized by paper section:
 - `section_b.ipynb`: Phase diagram analysis (Section III.B)
 - `section_c.ipynb`: Ice phase extrapolation (Section III.C)
 - `section_d.ipynb`: Compression/decompression trajectories (Section III.D)
-- `section_e.ipynb`: SCAN/MBpol analysis
+- `section_e.ipynb`: SCAN/MBpol analysis (Section III.E)
 
 ## Applying to Your Own Data
 
@@ -134,19 +144,18 @@ The repository includes implementations of several classification approaches:
 | Model | File | Input | Description |
 |-------|------|-------|-------------|
 | Probabilistic Model | `probabilistic_model.py` | ACSF + Steinhardt | Naive Bayes with KDE (this work) |
-| BOO-NN | `boo_nn.py` | Steinhardt only | Simple neural network |
-| PointNet | `pointnet.py` | Raw coordinates | Point cloud deep learning |
-| AE-GMM | `autoencoder_gmm.py` | Steinhardt only | Autoencoder + Gaussian Mixture |
+| BOO-NN | `boo_nn.py` | Steinhardt only | https://doi.org/10.1063/5.0193340 |
+| PointNet | `pointnet.py` | Raw coordinates | https://doi.org/10.1039/C9SC02097G |
+| AE-GMM | `autoencoder_gmm.py` | Steinhardt only | https://doi.org/10.1063/1.5118867 |
 
 ## Citation
 
 If you use this code, please cite:
 
 ```bibtex
-@article{gallagher2025local,
+@article{Gallagher:2026,
   title={A Local Structural Basis to Resolve Amorphous Ices},
-  author={Gallagher, Szukalo, et al.},
+  author={Gallagher, Quinn M and Szukalo, Ryan J and Giovambattista, Nicolas and Debenedetti, Pablo G and Webb, Michael A},
   journal={arXiv preprint arXiv:2601.17488},
-  year={2025}
-}
-```
+  year={2026}
+}```
