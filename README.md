@@ -146,7 +146,7 @@ The repository includes implementations of several classification approaches:
 | Probabilistic Model | `probabilistic_model.py` | ACSF + Steinhardt | Naive Bayes with KDE (this work) |
 | BOO-NN | `boo_nn.py` | Steinhardt only | https://doi.org/10.1063/5.0193340 |
 | PointNet | `pointnet.py` | Raw coordinates | https://doi.org/10.1039/C9SC02097G |
-| AE-GMM | `autoencoder_gmm.py` | Steinhardt only | https://doi.org/10.1063/1.5118867 |
+| AE-GMM | `autoencoder_gmm.py` | Steinhardt only | Adapted from https://doi.org/10.1063/1.5118867 |
 
 ## Citation
 
