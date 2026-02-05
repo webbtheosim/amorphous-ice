@@ -8,7 +8,6 @@ This repository contains all code and data associated with *A Local Structural B
 amorphous-ice/
 ├── README.md
 ├── environment.yml           # Conda environment specification
-├── requirements.txt          # Pip dependencies (alternative)
 ├── src/                      # Source code
 │   ├── config_template.py    # Configuration template for trajectory paths
 │   ├── prep_trajectory.py    # Trajectory preprocessing
@@ -45,12 +44,6 @@ Create and activate a conda environment:
 ```bash
 conda env create -f environment.yml
 conda activate amorphous-ice
-```
-
-Alternatively, install with pip:
-
-```bash
-pip install -r requirements.txt
 ```
 
 ## Quick Start: Reproducing the Analysis
