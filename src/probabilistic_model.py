@@ -160,6 +160,7 @@ class ProbabilisticModel:
 
         # Save values for future use.
         self.keep_idx = keep_idx
+        self.mi_all = mut_inf
         self.mutual_information = mut_inf[keep_idx]
         self.eval_funcs = eval_funcs
         self.chosen_features = keep_idx
@@ -241,3 +242,95 @@ class ProbabilisticModel:
             class_log_prob = class_log_prob[:,0:2]
 
         return np.exp(class_log_prob)
+    
+if __name__ == '__main__':
+
+    from sklearn.model_selection import KFold
+
+    state_labels = {
+        'hda': 0,
+        'lda': 1,
+        'ice': 2
+    }
+
+    def load_data(model, feat='all', size=16, states=['hda', 'lda']):
+        ''' Method for efficiently loading environments for a given number of neighbors. '''
+        desc_dir = '.'
+        descs = []
+        labels = []
+        for state in states:
+            if feat == 'stein':
+                stein = np.load(f'{desc_dir}/descriptors/neigh_{size}/{model}_{state}_stein.npy')
+                descs.append(stein)
+                for _ in range(stein.shape[0]):
+                    labels.append(state_labels[state])
+            elif feat == 'acsf':
+                acsf = np.load(f'{desc_dir}/descriptors/neigh_{size}/{model}_{state}_acsf.npy')
+                descs.append(acsf)
+                for _ in range(acsf.shape[0]):
+                    labels.append(state_labels[state])
+            elif feat == 'all':
+                acsf = np.load(f'{desc_dir}/descriptors/neigh_{size}/{model}_{state}_acsf.npy')
+                stein = np.load(f'{desc_dir}/descriptors/neigh_{size}/{model}_{state}_stein.npy')
+                desc = np.hstack((acsf, stein))
+                descs.append(desc)
+                for _ in range(desc.shape[0]):
+                    labels.append(state_labels[state])
+        desc = np.vstack(descs)
+        labels = np.array(labels)
+        return desc, labels
+
+    X, y = load_data(model='mbpol', feat='all')
+    print(f'Number of features: {X.shape[1]}')
+    hda_idx = np.argwhere(y == 0).reshape(-1)
+    lda_idx = np.argwhere(y == 1).reshape(-1)
+
+    log_prob_lda = []
+    kf = KFold(n_splits=5, shuffle=True, random_state=1)
+    for idx, (train_idx, test_idx) in enumerate(kf.split(X)):
+        print(f'Evaluating fold {idx + 1} / 5.')
+        X_train = X[train_idx]
+        y_train = y[train_idx]
+        X_test = X[test_idx]
+        y_test = y[test_idx]
+        model = ProbabilisticModel(
+            max_features=5, 
+            include=0.98,
+            detect_outliers=False,
+            corr_cut=0.8,
+            use_features=[44, 104, 105, 108, 109]
+        )
+        model.fit(X_train, y_train)
+        y_pred = model.predict(X_test, binary=True)   # Only consider HDA/LDA predictions.
+        log_probs = model.get_log_prob(X_test, binary=True) # Only consider HDA/LDA predictions.
+        lda_idx = np.argwhere(y_test == 1).reshape(-1) 
+        log_prob_lda.append(log_probs[lda_idx,1])
+    log_prob_lda = np.hstack(log_prob_lda).reshape(-1)
+
+    # Retrain our model on all HDA and LDA configurations.
+    model = ProbabilisticModel(
+        max_features=5, 
+        include=0.98,
+        detect_outliers=False,
+        corr_cut=0.8,
+        use_features=[44, 104, 105, 108, 109]
+    )
+    model.fit(X, y)
+
+    # Evaluate trained model when extrapolating to hexagonal ice structures.
+    X_ice_acsf = np.load(f'./descriptors/neigh_16/mbpol_ice_acsf.npy')
+    X_ice_stein = np.load(f'./descriptors/neigh_16/mbpol_ice_stein.npy')
+    X_ice = np.hstack((X_ice_acsf, X_ice_stein))
+
+    feat = 117
+    plt.hist(X_ice[:,feat], bins=30, label='Ice', alpha=0.5, density=True)
+    lda_idx = np.argwhere(y == 1).reshape(-1)
+    plt.hist(X[lda_idx,feat], bins=30, label='LDA', alpha=0.5, density=True)
+    plt.legend()
+    plt.show()
+
+    log_prob_ice = model.get_log_prob(X_ice, binary=True)[:,1]
+    plt.hist(log_prob_ice, bins=30, label='Ice', alpha=0.5, density=True)
+    plt.hist(log_prob_lda, bins=30, label='LDA', alpha=0.5, density=True)
+    plt.legend()
+    plt.show()
