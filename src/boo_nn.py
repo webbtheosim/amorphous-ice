@@ -13,9 +13,9 @@ class NeuralNetwork(nn.Module):
         Martelli et al.
     '''
 
-    def __init__(self, n_classes=3):
+    def __init__(self, in_dim, n_classes=3):
         super().__init__()
-        self.fc1 = nn.Linear(30,10)
+        self.fc1 = nn.Linear(in_dim,10)
         self.act1 = nn.Sigmoid()
         self.fc2 = nn.Linear(10,n_classes)
         self.act2 = nn.Sigmoid()
