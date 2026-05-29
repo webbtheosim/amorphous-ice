@@ -2,7 +2,7 @@ import numpy as np
 from typing import List, Tuple, Dict
 from ase import Atoms
 from itertools import product
-from scipy.special import sph_harm
+from scipy.special import sph_harm_y
 from ase.neighborlist import NeighborList
 from ase import Atoms
 from pathlib import Path
@@ -141,7 +141,7 @@ def spherical_harmonics(vectors: np.ndarray, l: int) -> np.ndarray:
     # get the m values for a given l
     # there will be 2l+1 m values
     m_values = np.arange(-l, l + 1)
-    sph_harmonics = np.array([sph_harm(m, l, theta, phi) for m in m_values])
+    sph_harmonics = np.array([sph_harm_y(m, l, theta, phi) for m in m_values])
 
     # reshape from (2l+1, ...) to (..., 2l+1)
     return np.moveaxis(sph_harmonics, 0, -1)

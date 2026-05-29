@@ -94,7 +94,7 @@ def label_traj(frame, model, n_neigh, idx, total_frames):
         positions = neighbor_vectors[row]
         frame_struct = Atoms(atom_types, positions=positions, pbc=False)
         acsf = ACSF(
-            species=types_,
+            species=atom_types,
             periodic=False,
             r_cut=5.0,
             g2_params=[[0.5, 1.0],[1.0, 1.0],[1.5, 1.0],[2.0, 1.0],[2.5, 1.0],[3.0, 1.0],[3.5, 1.0],[4.0, 1.0],[4.5, 1.0],[5.0, 1.0]],
