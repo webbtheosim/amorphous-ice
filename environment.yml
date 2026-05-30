@@ -4,7 +4,7 @@ channels:
   - pytorch
   - defaults
 dependencies:
-  - python==3.11
+  - python==3.10
   - numpy==1.26.4
   - scipy==1.16.0
   - scikit-learn>=1.0
