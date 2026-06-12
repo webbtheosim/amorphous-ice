@@ -3,6 +3,7 @@ from dscribe.descriptors import ACSF
 from joblib import Parallel, delayed
 import numpy as np
 import os
+from box_utils import cell_from_frame, minimum_image
 from steinhardt import get_steinhardt_params
 
 from config import scan_paths, mbpol_paths
@@ -17,19 +18,7 @@ def compute_acsf_and_stein(frame, idx, n_neigh):
     total_atoms = (n_neigh + 1) * 3
 
     # Process frame.
-    box_dim = np.array([
-        frame[0,2].item(),
-        frame[0,3].item(),
-        frame[1,2].item(),
-        frame[1,3].item(),
-        frame[2,2].item(),
-        frame[2,3].item()
-    ])
-    box_length = np.array([
-        box_dim[1] - box_dim[0],
-        box_dim[3] - box_dim[2],
-        box_dim[5] - box_dim[4]
-    ])
+    origin, cell = cell_from_frame(frame)
     types = frame[3:,0]
     atom_types = ['O' if i == 1 else 'H' for i in types]
     coords = frame[3:,1:]
@@ -41,17 +30,7 @@ def compute_acsf_and_stein(frame, idx, n_neigh):
     # Isolate atomic environment for ACSFs.
     oxy_coord = coords[oxygen_idx[key_idx]]
     dist_vec = coords - oxy_coord
-    for dim_idx in range(3):
-        dist_vec[:,dim_idx] = np.where(
-            dist_vec[:,dim_idx] > 0.5 * box_length[dim_idx], 
-            dist_vec[:,dim_idx] - box_length[dim_idx],
-            dist_vec[:,dim_idx]
-        )
-        dist_vec[:,dim_idx] = np.where(
-            dist_vec[:,dim_idx] < -0.5 * box_length[dim_idx], 
-            dist_vec[:,dim_idx] + box_length[dim_idx],
-            dist_vec[:,dim_idx]
-        )
+    dist_vec = minimum_image(dist_vec, cell)
     dist = np.linalg.norm(dist_vec, axis=-1)
     chosen_molecule_idx = np.argsort(dist)[0:total_atoms]
     save_coords = dist_vec[chosen_molecule_idx].reshape(-1,3)
@@ -78,9 +57,8 @@ def compute_acsf_and_stein(frame, idx, n_neigh):
     # Get atomic environment for Steinhardt descriptors.
     coords = coords[oxygen_idx]
     atom_types = ['O' for _ in range(coords.shape[0])]
-    shift_vector = box_dim[[0,2,4]]
-    centered_frame = coords - shift_vector
-    frame_struct = Atoms(atom_types, positions=centered_frame, cell=box_length, pbc=True)
+    centered_frame = coords - origin
+    frame_struct = Atoms(atom_types, positions=centered_frame, cell=cell, pbc=True)
 
     # Compute Steinhardt descriptors.
     stein = get_steinhardt_params(

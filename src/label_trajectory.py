@@ -6,6 +6,7 @@ import numpy as np
 import os
 import pickle
 
+from box_utils import parse_lammps_box, minimum_image
 from probabilistic_model import ProbabilisticModel
 from steinhardt import get_steinhardt_params
 
@@ -31,9 +32,7 @@ def label_traj(frame, model, n_neigh, idx, total_frames):
     n_atoms = (n_neigh + 1) * 3
 
     # Convert frame to numpy array.
-    x_lims = frame[5].strip().split()
-    y_lims = frame[6].strip().split()
-    z_lims = frame[7].strip().split()
+    origin, cell = parse_lammps_box(frame[4], frame[5], frame[6], frame[7])
     atom_ids = []
     coords = []
     for line in frame[9:]:
@@ -46,16 +45,6 @@ def label_traj(frame, model, n_neigh, idx, total_frames):
     coords = coords[sorted_idx]
 
     # Compute descriptors for each oxygen.
-    box_dim = np.array([
-        float(x_lims[0]), float(x_lims[1]),
-        float(y_lims[0]), float(y_lims[1]),
-        float(z_lims[0]), float(z_lims[1])
-    ])
-    box_length = np.array([
-        box_dim[1] - box_dim[0],
-        box_dim[3] - box_dim[2],
-        box_dim[5] - box_dim[4]
-    ])
     types = coords[3:,0]
     coords = coords[3:,1:]
     atom_types = ['O' if i == 1 else 'H' for i in types]
@@ -67,17 +56,7 @@ def label_traj(frame, model, n_neigh, idx, total_frames):
     for starting_id in oxygen_ids:
         oxy_coord = coords[starting_id]
         dist_vec = coords - oxy_coord
-        for dim_idx in range(3):
-            dist_vec[:,dim_idx] = np.where(
-                dist_vec[:,dim_idx] > 0.5 * box_length[dim_idx], 
-                dist_vec[:,dim_idx] - box_length[dim_idx],
-                dist_vec[:,dim_idx]
-            )
-            dist_vec[:,dim_idx] = np.where(
-                dist_vec[:,dim_idx] < -0.5 * box_length[dim_idx], 
-                dist_vec[:,dim_idx] + box_length[dim_idx],
-                dist_vec[:,dim_idx]
-            )
+        dist_vec = minimum_image(dist_vec, cell)
         dist = np.linalg.norm(dist_vec, axis=-1)
         chosen_molecule_idx = np.argsort(dist)[0:n_atoms]
         save_coords = dist_vec[chosen_molecule_idx].reshape(-1,3)
@@ -113,9 +92,8 @@ def label_traj(frame, model, n_neigh, idx, total_frames):
     coords = coords[oxygen_idx]
 
     # Generate Steinhardt descriptors for each oxygen atom.
-    shift_vector = box_dim[[0,2,4]]
-    centered_frame = coords - shift_vector
-    frame_struct = Atoms(atom_types, positions=centered_frame, cell=box_length, pbc=True)
+    centered_frame = coords - origin
+    frame_struct = Atoms(atom_types, positions=centered_frame, cell=cell, pbc=True)
 
     # Compute Steinhardt descriptors.
     stein = get_steinhardt_params(

@@ -5,6 +5,7 @@ import json
 from collections import defaultdict
 from datetime import datetime
 
+from box_utils import parse_lammps_box
 from config import scan_paths, mbpol_paths
 
 import functools
@@ -389,13 +390,13 @@ def condense(path, limits, max_frames=10000):
                 frame_lines = lines[frame_idx * frame_length : (frame_idx + 1) * frame_length]
 
                 # Get simulation box limits.
-                x_lims = frame_lines[5].strip().split()
-                y_lims = frame_lines[6].strip().split()
-                z_lims = frame_lines[7].strip().split()
+                origin, cell = parse_lammps_box(
+                    frame_lines[4], frame_lines[5], frame_lines[6], frame_lines[7]
+                )
                 frame_ = [
-                    [-1.0, -1.0, float(x_lims[0]), float(x_lims[1])],
-                    [-1.0, -1.0, float(y_lims[0]), float(y_lims[1])],
-                    [-1.0, -1.0, float(z_lims[0]), float(z_lims[1])],
+                    [cell[1,0], cell[2,0], origin[0], origin[0] + cell[0,0]],  # xy, xz, xlo, xhi
+                    [cell[2,1], 0.0,       origin[1], origin[1] + cell[1,1]],  # yz, 0,  ylo, yhi
+                    [0.0,       0.0,       origin[2], origin[2] + cell[2,2]],  # 0,  0,  zlo, zhi
                 ]
 
                 # Get coordinates.
