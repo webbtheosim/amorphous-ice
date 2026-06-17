@@ -542,10 +542,15 @@ def generate_report(distribution, results):
 if __name__ == '__main__':
     np.random.seed(1)
 
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--model', choices=['scan', 'mbpol'], default='mbpol')
+    args = parser.parse_args()
+
     # Configuration
     SIZE_PER_STATE = 10000
-    IDENTIFIER = 'mbpol'
-    file_paths = mbpol_paths
+    IDENTIFIER = args.model
+    file_paths = mbpol_paths if args.model == 'mbpol' else scan_paths
 
     # Create output directory
     os.makedirs('../data/frames', exist_ok=True)
