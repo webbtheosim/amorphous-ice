@@ -161,10 +161,12 @@ class ProbabilisticModel:
             feature_mask = torch.all(prob < 5e-4, axis=2)
             instance_mask = torch.any(feature_mask, axis=1)
             ood_idx = torch.where(instance_mask)[0]
+            keep_features_idx = [self.all_feat.index(i) for i in self.keep_idx]
+            class_log_prob = torch.sum(torch.log(prob[:,keep_features_idx,:] + 1e-30), dim=1).numpy()
+        else:
+            class_log_prob = torch.sum(torch.log(prob + 1e-30), dim=1).numpy()
 
         # Get labels.
-        keep_features_idx = [self.all_feat.index(i) for i in self.keep_idx]
-        class_log_prob = torch.sum(torch.log(prob[:,keep_features_idx,:] + 1e-30), dim=1).numpy()
         labels = np.argmax(class_log_prob, axis=1)
         if ood:
             labels[ood_idx] = -1
