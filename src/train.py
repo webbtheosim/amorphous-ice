@@ -35,20 +35,21 @@ if __name__ == '__main__':
     parser.add_argument('--model', choices=['scan', 'mbpol'], default='mbpol')
     parser.add_argument('--size', type=int, choices=[16, 12, 8, 7, 6, 5, 4, 3, 2], default=16)
     parser.add_argument('--n_feat', type=int, default=5)
-    parser.add_argument('--include', type=float, default=0.98)
+    parser.add_argument('--out_feat', type=int, default=20)
     args = parser.parse_args()
 
-    model_name = f'model_{args.model}_size_{args.size}_feat_{args.n_feat}_include_{args.include}.pkl'
+    model_name = f'model_{args.model}_size_{args.size}_feat_{args.n_feat}_out_{args.out_feat}.pkl'
     print(f'Training model: {model_name}')
 
     X, y = load_data(model=args.model, size=args.size, states=['hda', 'lda'])
     model = ProbabilisticModel(
-        max_features=args.n_feat,
-        include=args.include,
-        detect_outliers=True,
-        # use_features=[0, 109, 90, 91, 108]
+        n_feat=args.n_feat,
+        n_outlier=args.out_feat,
+        class_feat=[0, 109, 90, 91, 108],
+        corr_cut=0.8
     )
     model.fit(X, y)
+    print(f'Chosen features: {model.chosen_features}')
 
     if not os.path.exists('../data/models'):
         os.makedirs('../data/models')
