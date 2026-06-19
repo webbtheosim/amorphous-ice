@@ -108,11 +108,11 @@ def label_traj(frame, model, n_neigh, idx, total_frames):
     all_feats = all_feats.astype(np.float16)
     
     # Get labels and confidences.
-    class_log_prob = model.confidence(X=all_feats, binary=True)
+    class_log_prob = model.confidence(X=all_feats, ood=False)
     class_prob = np.exp(class_log_prob)
 
     # Get labels and HDA/LDA occurrences.
-    y_pred = model.predict(X=all_feats, binary=True)
+    y_pred = model.predict(X=all_feats, ood=True)
     hda_pred = np.argwhere(y_pred == 0).reshape(-1)
     lda_pred = np.argwhere(y_pred == 1).reshape(-1)
 
@@ -181,6 +181,6 @@ if __name__ == '__main__':
     np.save(f'../data/labels/{args.model}/{save_name}.pred.npy', pred_info)
 
     # Save features for entire trajectory (only for particular models...).
-    if 'size_16' in model_name and '0.999' in model_name:
+    if 'size_16' in model_name:
         features = np.stack([result[4] for result in results], axis=0)
         np.save(f'../data/labels/{args.model}/{save_name}.feat.npy', features)
