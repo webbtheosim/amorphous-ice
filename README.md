@@ -149,6 +149,6 @@ If you use this code, please cite:
 @article{Gallagher:2026,
   title={A Local Structural Basis to Resolve Amorphous Ices},
   author={Gallagher, Quinn M and Szukalo, Ryan J and Giovambattista, Nicolas and Debenedetti, Pablo G and Webb, Michael A},
-  journal={arXiv preprint arXiv:2601.17488},
+  journal={Nature Communications},
   year={2026}
 }```
