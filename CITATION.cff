@@ -1,0 +1,64 @@
+cff-version: 1.2.0
+message: >-
+  If you use this code or data, please cite both this software release and the
+  associated article.
+title: "Code and Data for A Local Structural Basis to Resolve Amorphous Ices"
+type: software
+version: 1.0.0
+date-released: 2026-08-12
+license: GPL-3.0-only
+repository-code: "https://github.com/webbtheosim/amorphous-ice"
+url: "https://github.com/webbtheosim/amorphous-ice"
+abstract: >-
+  Code and data for generating descriptors of atomic environments, training an
+  interpretable probabilistic classifier, and analysing low-density and
+  high-density amorphous ice and their pressure-induced interconversion.
+keywords:
+  - amorphous ice
+  - water
+  - molecular simulation
+  - structural descriptors
+  - probabilistic classification
+  - machine learning
+  - polyamorphism
+authors:
+  - family-names: Gallagher
+    given-names: Quinn M.
+    orcid: "https://orcid.org/0009-0007-0695-2650"
+    affiliation: "Princeton University"
+  - family-names: Szukalo
+    given-names: Ryan J.
+    affiliation: "Princeton University"
+  - family-names: Giovambattista
+    given-names: Nicolas
+    orcid: "https://orcid.org/0000-0003-1149-0693"
+    affiliation: "Brooklyn College and The Graduate Center, City University of New York"
+  - family-names: Debenedetti
+    given-names: Pablo G.
+    orcid: "https://orcid.org/0000-0003-1881-1728"
+    affiliation: "Princeton University"
+  - family-names: Webb
+    given-names: Michael A.
+    orcid: "https://orcid.org/0000-0002-7420-4474"
+    affiliation: "Princeton University"
+preferred-citation:
+  type: article
+  title: "A Local Structural Basis to Resolve Amorphous Ices"
+  authors:
+    - family-names: Gallagher
+      given-names: Quinn M.
+      orcid: "https://orcid.org/0009-0007-0695-2650"
+    - family-names: Szukalo
+      given-names: Ryan J.
+    - family-names: Giovambattista
+      given-names: Nicolas
+      orcid: "https://orcid.org/0000-0003-1149-0693"
+    - family-names: Debenedetti
+      given-names: Pablo G.
+      orcid: "https://orcid.org/0000-0003-1881-1728"
+    - family-names: Webb
+      given-names: Michael A.
+      orcid: "https://orcid.org/0000-0002-7420-4474"
+  journal: "Nature Communications"
+  year: 2026
+  preprint-url: "https://arxiv.org/abs/2601.17488"
